@@ -28,6 +28,20 @@ func test(t *testing.T, manifestPath string) {
 	fixture.RunConformance(t)
 }
 
+func TestWildcardConformance(t *testing.T) {
+
+	fixture := dns.NewFixture(&powerDNSProviderSolver{},
+		dns.SetDNSServer(dnsServer),
+		dns.SetResolvedZone(zone),
+		dns.SetDNSName("*.example.ca"),
+		dns.SetAllowAmbientCredentials(false),
+		dns.SetManifestPath("_out/testdata/no-tls"),
+		dns.SetStrict(true),
+	)
+
+	fixture.RunConformance(t)
+}
+
 func TestNoProxyNoTLS(t *testing.T) {
 	test(t, "_out/testdata/no-tls")
 }
@@ -72,6 +86,8 @@ func TestIsAllowedZones(t *testing.T) {
 		{"foo.example.net.", false},
 		{"example.com.", true},
 		{"notexample.com.", false},
+		{"*.local.com.", false},
+		{"*.sub.example.com.", true},
 	}
 
 	for _, tt := range tests {
