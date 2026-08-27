@@ -2,31 +2,31 @@ services:
   pdns:
     build: testdata/pdns/docker/pdns
     ports:
-      - '127.0.0.1:53:53/udp'
-      - '127.0.0.1:53:53/tcp'
-      - '8080:8080'
+      - "127.0.0.1:53:53/udp"
+      - "127.0.0.1:53:53/tcp"
+      - "8080:8080"
     volumes:
-      - data:/data
+      - data:/data:z
     environment:
       - PDNS_API_KEY=test123
 
   web:
     image: nginx:1.29
     ports:
-      - '8443:8443'
+      - "8443:8443"
     volumes:
-      - ./_out/cert.pem:/etc/ssl/cert.pem
-      - ./_out/key.pem:/etc/ssl/key.pem
-      - ./testdata/pdns/docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./_out/cert.pem:/etc/ssl/cert.pem:z
+      - ./_out/key.pem:/etc/ssl/key.pem:z
+      - ./testdata/pdns/docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:z
     depends_on:
       - pdns
 
   proxy:
     image: ubuntu/squid:6.10-24.10_beta
     ports:
-      - '3128:3128'
+      - "3128:3128"
     volumes:
-      - ./testdata/pdns/docker/squid/squid.conf:/etc/squid/squid.conf
+      - ./testdata/pdns/docker/squid/squid.conf:/etc/squid/squid.conf:z
     ulimits:
       nofile:
         soft: 65536
