@@ -215,6 +215,12 @@ func (c *powerDNSProviderSolver) Present(ch *v1alpha1.ChallengeRequest) error {
 func (c *powerDNSProviderSolver) CleanUp(ch *v1alpha1.ChallengeRequest) error {
 	ctx := context.Background()
 
+	//do not create a request for _acme_challenge.*.domain.tld
+	//https://www.rfc-editor.org/info/rfc8555/
+	dnsName := ch.DNSName
+	if strings.HasPrefix(dnsName, "*.") {
+		ch.ResolvedFQDN = fmt.Sprintf("_acme-challenge.%s.", strings.TrimPrefix(dnsName, "*."))
+	}
 	klog.InfoS("Cleaning challenge", "dnsName", ch.DNSName, "resolvedZone", ch.ResolvedZone, "resolvedFQDN", ch.ResolvedFQDN)
 
 	provider, cfg, err := c.init(ch.Config, ch.ResourceNamespace)
