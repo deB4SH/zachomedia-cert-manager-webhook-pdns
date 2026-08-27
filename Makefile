@@ -1,7 +1,7 @@
 IMAGE_NAME := "zachomedia/cert-manager-webhook-pdns"
 IMAGE_TAG := "latest"
 
-CONTAINER_ENGINE ?= $(shell command -v podman 2>/dev/null || command -v docker 2>/dev/null)
+CONTAINER_ENGINE ?= $(command -v docker 2>/dev/null || shell command -v podman 2>/dev/null)
 ifeq ($(CONTAINER_ENGINE),)
 $(error Neither podman nor docker was found in PATH)
 endif
