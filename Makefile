@@ -1,18 +1,27 @@
 IMAGE_NAME := "zachomedia/cert-manager-webhook-pdns"
 IMAGE_TAG := "latest"
 
+CONTAINER_ENGINE ?= $(shell command -v podman 2>/dev/null || command -v docker 2>/dev/null)
+ifeq ($(CONTAINER_ENGINE),)
+$(error Neither podman nor docker was found in PATH)
+endif
+ENGINE_NAME := $(notdir $(CONTAINER_ENGINE))
+
 OUT := $(shell pwd)/_out
 
 $(shell mkdir -p "$(OUT)")
 
+info:
+	@echo "Using container engine: $(ENGINE_NAME) ($(CONTAINER_ENGINE))"
+
 setup:
 	./scripts/fetch-test-binaries.sh
 	./scripts/setup-tests.sh
-	docker compose -f docker-compose.test.yaml up --build -d
+	$(CONTAINER_ENGINE) compose -f docker-compose.test.yaml up --build -d
 
 clean:
 	rm -rf _out/
-	docker compose -f docker-compose.test.yaml down -v
+	$(CONTAINER_ENGINE) compose -f docker-compose.test.yaml down -v
 	go clean
 	go clean -testcache
 
